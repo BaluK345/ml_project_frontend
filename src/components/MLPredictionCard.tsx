@@ -90,6 +90,6 @@ export const MLPredictionCard: React.FC<MLPredictionCardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+     </div>
   );
 };
