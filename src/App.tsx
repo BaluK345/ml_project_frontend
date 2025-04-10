@@ -70,7 +70,8 @@ const mockInventory: FoodItem[] = [
   },
 ];
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Corrected API base URL (remove trailing slash)
+const API_BASE_URL = 'http://localhost:8000/api/inventory';
 
 const formatCurrency = (value: number) => {
   return `₹${value.toLocaleString('en-IN')}`;
@@ -202,7 +203,7 @@ function App() {
       };
 
       try {
-        await axios.post(`${API_BASE_URL}/inventory/`, newItem);
+        await axios.get(`${API_BASE_URL}/inventory/`, newItem);
         const inventoryRes = await axios.get(`${API_BASE_URL}/inventory/`);
         setInventory(inventoryRes.data);
         
@@ -303,11 +304,11 @@ function App() {
                 description="Total value of current stock"
               />
               <StatCard
-                icon={Scale}
-                title="Total Inventory"
-                value={`${inventory.reduce((sum, item) => sum + item.quantity, 0)} kg`}
-                trend="+1.8%"
-                description="Current stock weight"
+              icon={Scale}
+              title="Total Inventory"
+              value={`${inventory.reduce((sum, item) => sum + Number(item.quantity), 0)} kg`}
+              trend="+1.8%"
+              description="Current stock weight"
               />
               <StatCard
                 icon={Trash2}
@@ -317,14 +318,21 @@ function App() {
                 description="Total value of wasted items"
               />
               <StatCard
-                icon={AlertTriangle}
-                title="At Risk Value"
-                value={formatCurrency(inventory
-                  .filter(item => new Date(item.expiryDate) <= addDays(new Date(), 3))
-                  .reduce((total, item) => total + (item.quantity * item.costPerKg), 0))}
-                trend="+5.2%"
-                description="Value of items near expiry"
-              />
+  icon={AlertTriangle}
+  title="At Risk Value"
+  value={formatCurrency(
+    inventory
+      .filter(item => 
+        new Date(item.expiryDate) <= addDays(new Date(), 3)
+      )
+      .reduce((total: number, item: FoodItem) => 
+        total + (item.quantity * item.costPerKg), 
+      0
+    )
+  )}
+  trend="+5.2%"
+  description="Value of items near expiry"
+/>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
