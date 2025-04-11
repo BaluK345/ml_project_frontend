@@ -79,7 +79,7 @@ export const MLPredictionCard: React.FC<MLPredictionCardProps> = ({
             <div>
               <p className="text-sm text-gray-600">Ensemble Prediction</p>
               <p className="text-2xl font-bold text-purple-600">{averagePrediction.toFixed(1)} kg</p>
-              <p className="text-xs text-gray-500 mt-1">Expected waste for tomorrow</p>
+              {/* <p className="text-xs text-gray-500 mt-1">Expected waste for tomorrow</p> */}
             </div>
             {confidence < 70 && (
               <div className="flex items-center text-yellow-600">
@@ -90,6 +90,6 @@ export const MLPredictionCard: React.FC<MLPredictionCardProps> = ({
           </div>
         </div>
       </div>
-     </div>
+    </div>
   );
 };

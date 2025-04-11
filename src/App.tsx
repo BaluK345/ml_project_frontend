@@ -70,31 +70,12 @@ const mockInventory: FoodItem[] = [
   },
 ];
 
-// Corrected API base URL (remove trailing slash)
 const API_BASE_URL = 'http://localhost:8000/api';
 
-const formatCurrency = (value: number | undefined | null) => {
-  if (typeof value !== 'number') {
-    console.warn('Invalid value passed to formatCurrency:', value);
-    return '₹0';
-  }
+const formatCurrency = (value: number) => {
   return `₹${value.toLocaleString('en-IN')}`;
 };
-console.log("cost_per_kg value from backend:", item.cost_per_kg);
-// const sendRequest = async (yourData: any) => {
-//   try {
-//     const response = await axios.post(`${API_BASE_URL}/inventory`, yourData);
 
-//     // ✅ Print the full response
-//     console.log('✅ Response from server:', response.data);
-    
-//     // If you only want to log specific parts of the response:
-//     // console.log('Predicted Value:', response.data.predicted_value);
-    
-//   } catch (error: any) {
-//     console.error('❌ Error from server:', error.response?.data || error.message);
-//   }
-// };
 
 const StatCard = ({ icon: Icon, title, value, trend, description }: { icon: any, title: string, value: string, trend: string, description?: string }) => (
   <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -142,7 +123,7 @@ function App() {
       try {
         const [wasteRes, inventoryRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/waste-data/`),
-          axios.get(`${API_BASE_URL}/inventory/`)
+          axios.get(`${API_BASE_URL}/inventory/inventory/`)
         ]);
         setWasteData(wasteRes.data);
         setInventory(inventoryRes.data);
@@ -222,7 +203,7 @@ function App() {
       };
 
       try {
-        await axios.get(`${API_BASE_URL}/inventory/`, newItem);
+        await axios.post(`${API_BASE_URL}/inventory/`, newItem);
         const inventoryRes = await axios.get(`${API_BASE_URL}/inventory/`);
         setInventory(inventoryRes.data);
         
@@ -337,21 +318,14 @@ function App() {
                 description="Total value of wasted items"
               />
               <StatCard
-  icon={AlertTriangle}
-  title="At Risk Value"
-  value={formatCurrency(
-    inventory
-      .filter(item => 
-        new Date(item.expiryDate) <= addDays(new Date(), 3)
-      )
-      .reduce((total: number, item: FoodItem) => 
-        total + (item.quantity * item.costPerKg), 
-      0
-    )
-  )}
-  trend="+5.2%"
-  description="Value of items near expiry"
-/>
+                icon={AlertTriangle}
+                title="At Risk Value"
+                value={formatCurrency(inventory
+                  .filter(item => new Date(item.expiryDate) <= addDays(new Date(), 3))
+                  .reduce((total, item) => total + (item.quantity * item.costPerKg), 0))}
+                trend="+5.2%"
+                description="Value of items near expiry"
+              />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -538,7 +512,7 @@ function App() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.category}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity} kg</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(item.costPerKg)}</td>
-                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency( item.cost_per_kg)}</td> */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(item.quantity * item.costPerKg)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.expiryDate}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}`}>
